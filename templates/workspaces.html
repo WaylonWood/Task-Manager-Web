@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+
+{% block title %}Workspaces - Task Manager{% endblock %}
+
+{% block content %}
+<!-- Dashboard Header -->
+<div class="dashboard-header">
+  <div class="header-content">
+    <div class="page-title-section">
+      <h1 class="gradient-text">
+        <i class="fas fa-building"></i> 
+        My Workspaces
+      </h1>
+      <p class="page-subtitle">Organize your projects and collaborate with your team</p>
+    </div>
+  </div>
+</div>
+
+<!-- Main Workspaces Section -->
+<div class="workspaces-section">
+  {% if workspaces %}
+  <div class="task-section">
+    <div class="section-header">
+      <h3 class="section-title-modern">
+        <i class="fas fa-building"></i>
+        My Workspaces
+        <span class="task-count-badge">{{ workspaces|length }}</span>
+      </h3>
+      <a href="{{ url_for('create_workspace') }}" class="btn-compact btn-primary">
+        <i class="fas fa-plus"></i>
+        <span>Create Workspace</span>
+      </a>
+    </div>
+    <div id="workspacesList" class="tasks-grid">
+      {% for workspace in workspaces %}
+      <div class="task-card" data-workspace-id="{{ workspace.id }}">
+        <div class="task-card-inner">
+          <!-- Workspace Card Main Content -->
+          <div class="task-card-main">
+            <!-- Workspace Card Header -->
+            <div class="task-card-header">
+              <h3 class="task-title">{{ workspace.name }}</h3>
+              {% if workspace.owner_id == current_user.id %}
+              <div class="task-priority-badge priority-high">
+                <i class="fas fa-crown"></i>
+                Owner
+              </div>
+              {% else %}
+              <div class="task-priority-badge priority-low">
+                <i class="fas fa-user"></i>
+                Member
+              </div>
+              {% endif %}
+            </div>
+            
+            <!-- Workspace Card Content -->
+            <div class="task-card-content">
+              {% if workspace.description %}
+              <div class="task-description">
+                <p>{{ workspace.description }}</p>
+              </div>
+              {% endif %}
+              
+              <div class="task-meta">
+                <span class="task-due">
+                  <i class="fas fa-folder"></i>
+                  {{ workspace.projects | length }} project{{ 's' if workspace.projects | length != 1 else '' }}
+                </span>
+                <span class="task-created">
+                  <i class="fas fa-users"></i>
+                  {{ workspace.members | length }} member{{ 's' if workspace.members | length != 1 else '' }}
+                </span>
+                <span class="task-created">
+                  <i class="fas fa-calendar"></i>
+                  {{ workspace.created_at.strftime('%m/%d') }}
+                </span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Workspace Card Actions (Right Side) -->
+          <div class="task-card-actions">
+            <a href="{{ url_for('workspace_detail', workspace_id=workspace.id) }}" class="btn-compact btn-success">
+              <i class="fas fa-eye"></i>
+              <span>View</span>
+            </a>
+            {% if workspace.owner_id == current_user.id %}
+            <button 
+              class="btn-compact btn-danger delete-workspace-btn"
+              data-workspace-id="{{ workspace.id }}"
+              data-workspace-name="{{ workspace.name | e }}">
+              <i class="fas fa-trash"></i>
+              <span>Delete</span>
+            </button>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% else %}
+  <div class="empty-state-modern">
+    <div class="empty-content">
+      <div class="empty-icon">
+        <i class="fas fa-building"></i>
+      </div>
+      <h3>No workspaces yet</h3>
+      <p>Create your first workspace to organize your projects and collaborate with your team.</p>
+      <a href="{{ url_for('create_workspace') }}" class="btn-compact btn-primary">
+        <i class="fas fa-rocket"></i>
+        <span>Create Your First Workspace</span>
+      </a>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Delete Workspace Confirmation Modal -->
+<div id="deleteWorkspaceModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-exclamation-triangle"></i> Delete Workspace</h3>
+            <button type="button" class="btn-icon modal-close" onclick="closeDeleteModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <p>Are you sure you want to delete the workspace "<span id="workspaceNameToDelete"></span>"?</p>
+            <p class="warning-text">This action cannot be undone. All projects, tasks, and data in this workspace will be permanently deleted.</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn-compact btn-outline" onclick="closeDeleteModal()">
+                <i class="fas fa-times"></i>
+                <span>Cancel</span>
+            </button>
+            <form id="deleteWorkspaceForm" method="POST" style="display: inline;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn-compact btn-danger">
+                    <i class="fas fa-trash"></i>
+                    <span>Delete Workspace</span>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+let workspaceToDelete = null;
+
+function confirmDeleteWorkspace(workspaceId, workspaceName) {
+    workspaceToDelete = workspaceId;
+    document.getElementById('workspaceNameToDelete').textContent = workspaceName;
+    // Fix URL to match Flask route: /workspace/<id>/delete
+    document.getElementById('deleteWorkspaceForm').action = `/workspace/${workspaceId}/delete`;
+    document.getElementById('deleteWorkspaceModal').style.display = 'flex';
+}
+
+function closeDeleteModal() {
+    document.getElementById('deleteWorkspaceModal').style.display = 'none';
+    workspaceToDelete = null;
+}
+
+// Close modal when clicking outside
+document.getElementById('deleteWorkspaceModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeDeleteModal();
+    }
+});
+
+// Dropdown functionality and delete bindings
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.dropdown-toggle').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const menu = this.nextElementSibling;
+            
+            // Close all other dropdowns
+            document.querySelectorAll('.dropdown-menu').forEach(otherMenu => {
+                if (otherMenu !== menu) {
+                    otherMenu.style.display = 'none';
+                }
+            });
+            
+            // Toggle current dropdown
+            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        });
+    });
+    
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function() {
+        document.querySelectorAll('.dropdown-menu').forEach(menu => {
+            menu.style.display = 'none';
+        });
+    });
+
+    // Bind delete buttons without inline JS
+    document.querySelectorAll('.delete-workspace-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const id = this.getAttribute('data-workspace-id');
+            const name = this.getAttribute('data-workspace-name');
+            confirmDeleteWorkspace(id, name);
+        });
+    });
+});
+</script>
+{% endblock %}

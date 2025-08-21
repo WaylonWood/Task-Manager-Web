@@ -1,0 +1,251 @@
+/*-----------------------------------
+  Create Workspace Page Specific Styles
+  
+  Only loaded on the create_workspace page
+-----------------------------------*/
+
+/* Create workspace page specific styles */
+.page-create_workspace .create-workspace-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.page-create_workspace .create-workspace-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.page-create_workspace .create-workspace-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.page-create_workspace .create-workspace-subtitle {
+  color: var(--text-muted);
+  font-size: 1.1rem;
+}
+
+.page-create_workspace .workspace-form {
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-glass);
+  border-radius: 16px;
+  padding: 32px;
+}
+
+.page-create_workspace .form-section {
+  margin-bottom: 32px;
+}
+
+.page-create_workspace .form-section:last-child {
+  margin-bottom: 0;
+}
+
+.page-create_workspace .section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.page-create_workspace .section-icon {
+  width: 32px;
+  height: 32px;
+  background: var(--primary-color);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 0.875rem;
+}
+
+.page-create_workspace .workspace-type-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.page-create_workspace .workspace-type-card {
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-glass);
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.page-create_workspace .workspace-type-card:hover {
+  border-color: var(--border-glass-hover);
+  transform: translateY(-2px);
+}
+
+.page-create_workspace .workspace-type-card.selected {
+  border-color: var(--primary-color);
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.page-create_workspace .workspace-type-icon {
+  font-size: 2.5rem;
+  margin-bottom: 16px;
+  color: var(--primary-color);
+}
+
+.page-create_workspace .workspace-type-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+  font-size: 1.1rem;
+}
+
+.page-create_workspace .workspace-type-description {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.page-create_workspace .privacy-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.page-create_workspace .privacy-option {
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-glass);
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.page-create_workspace .privacy-option:hover {
+  border-color: var(--border-glass-hover);
+}
+
+.page-create_workspace .privacy-option.selected {
+  border-color: var(--primary-color);
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.page-create_workspace .privacy-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.page-create_workspace .privacy-icon {
+  font-size: 1.25rem;
+  color: var(--primary-color);
+}
+
+.page-create_workspace .privacy-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.page-create_workspace .privacy-description {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.page-create_workspace .members-section {
+  margin-top: 24px;
+}
+
+.page-create_workspace .member-input {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.page-create_workspace .member-input input {
+  flex: 1;
+}
+
+.page-create_workspace .members-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.page-create_workspace .member-tag {
+  background: var(--primary-color);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.page-create_workspace .member-remove {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.page-create_workspace .form-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: flex-end;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-glass);
+}
+
+/* Create workspace animations */
+.page-create_workspace .workspace-form {
+  animation: fadeInUp 0.6s ease;
+}
+
+.page-create_workspace .form-section {
+  animation: fadeInUp 0.6s ease;
+}
+
+.page-create_workspace .form-section:nth-child(1) { animation-delay: 0.1s; }
+.page-create_workspace .form-section:nth-child(2) { animation-delay: 0.2s; }
+.page-create_workspace .form-section:nth-child(3) { animation-delay: 0.3s; }
+.page-create_workspace .form-section:nth-child(4) { animation-delay: 0.4s; }
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive design for create workspace */
+@media (max-width: 768px) {
+  .page-create_workspace .workspace-type-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .page-create_workspace .privacy-options {
+    grid-template-columns: 1fr;
+  }
+  
+  .page-create_workspace .member-input {
+    flex-direction: column;
+  }
+  
+  .page-create_workspace .form-actions {
+    flex-direction: column;
+  }
+}

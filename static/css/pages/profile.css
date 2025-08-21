@@ -1,0 +1,343 @@
+/*-----------------------------------
+  Profile Page Specific Styles
+  
+  Only loaded on the profile page
+-----------------------------------*/
+
+/* Scoped spacing and accent tokens for the Profile page */
+.page-profile {
+  --profile-gap: 18px;            /* unified gap for grids/forms */
+  --profile-pad: 22px;            /* unified internal padding */
+  --profile-accent: var(--primary-color);
+  /* Low-alpha blue rings for tinting glass subtly */
+  --profile-accent-weak: rgba(59, 130, 246, 0.08);
+  --profile-accent-weak-2: rgba(59, 130, 246, 0.12);
+}
+
+/* Profile page specific styles */
+.page-profile .profile-container {
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.page-profile .profile-header {
+  /* Flatten the header for a sleeker, less “card” look */
+  background: transparent;
+  backdrop-filter: none;
+  border: none;
+  border-radius: 0;
+  padding: var(--profile-pad);
+  text-align: center;
+  margin-bottom: 22px;
+}
+
+.page-profile .profile-avatar {
+  /* Slimmer ring and softer halo for a lighter feel */
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--border-glass);
+  /* Add a faint brand-blue outer halo to match app accents */
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08), 0 0 0 6px rgba(255, 255, 255, 0.03), 0 0 0 9px var(--profile-accent-weak);
+  margin-bottom: 16px;
+}
+
+.page-profile .profile-name {
+  font-size: 1.75rem;
+  font-weight: 700;
+  /* Brand gradient title like other pages */
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  letter-spacing: 0.2px;
+  margin-bottom: 8px;
+}
+
+.page-profile .profile-email {
+  color: var(--text-muted);
+  font-size: 1.05rem;
+  margin-bottom: 18px; /* slightly tighter */
+}
+
+.page-profile .profile-stats {
+  /* Single-line chips with horizontal scroll on overflow */
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: var(--profile-gap);
+  margin-bottom: 22px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: var(--border-glass) transparent;
+}
+
+/* Use .stat-item to match the template markup */
+.page-profile .stat-item {
+  /* Lightweight glass with a soft brand-blue tint */
+  text-align: center;
+  padding: 16px;
+  background: linear-gradient(180deg, var(--profile-accent-weak-2), rgba(59, 130, 246, 0.04) 40%, transparent 100%), var(--bg-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-glass);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  transition: box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+  /* Inline content */
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  text-align: left;
+  padding: 10px 14px; /* a bit more compact for inline chips */
+  white-space: nowrap; /* keep number + label together */
+  flex: 0 0 auto; /* prevent wrapping to next line */
+}
+
+.page-profile .stat-item:hover,
+.page-profile .stat-item:focus-within {
+  /* Subtle blue ring for hover/focus to align with brand */
+  box-shadow: 0 0 0 1px var(--border-glass), 0 6px 16px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 0 0 4px var(--profile-accent-weak);
+  border-color: var(--border-glass-hover);
+}
+
+.page-profile .stat-number {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  line-height: 1;
+  margin-right: 4px; /* small space before label when inline */
+}
+
+.page-profile .stat-label {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin-top: 0; /* inline with number */
+}
+
+.page-profile .profile-sections {
+  display: grid;
+  gap: 20px;
+}
+
+.page-profile .profile-section {
+  /* Already transparent; keep but make spacing a touch more breathable */
+  background: transparent;
+  backdrop-filter: none;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  margin-top: 12px;
+}
+
+.page-profile .section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  /* Brand gradient for section headers to match the app */
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 14px;
+}
+
+.page-profile .profile-form {
+  display: grid;
+  gap: var(--profile-gap);
+}
+
+.page-profile .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.page-profile .avatar-upload {
+  position: relative;
+  display: inline-block;
+}
+
+.page-profile .avatar-upload input[type="file"] {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.page-profile .avatar-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  cursor: pointer;
+}
+
+.page-profile .avatar-upload:hover .avatar-overlay {
+  opacity: 1;
+}
+
+.page-profile .avatar-overlay i {
+  color: white;
+  font-size: 1.5rem;
+}
+
+/* Profile page animations */
+.page-profile .profile-header {
+  animation: fadeInUp 0.5s ease;
+}
+
+.page-profile .profile-section {
+  animation: fadeInUp 0.5s ease;
+}
+
+.page-profile .profile-section:nth-child(1) { animation-delay: 0.08s; }
+.page-profile .profile-section:nth-child(2) { animation-delay: 0.16s; }
+.page-profile .profile-section:nth-child(3) { animation-delay: 0.24s; }
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive design for profile */
+@media (max-width: 768px) {
+  .page-profile .form-row {
+    grid-template-columns: 1fr;
+  }
+  
+  /* Keep chips in a single row; allow horizontal scroll on small screens */
+  .page-profile .profile-stats {
+    gap: 12px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .page-profile .profile-avatar {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+/* Ensure consistent padding for all profile form inputs by ID */
+#full-name,
+#email,
+#current-password,
+#new-password,
+#confirm-password {
+  padding: 12px 16px !important;
+  box-sizing: border-box !important;
+}
+
+/* Fix form container padding to ensure equal spacing to card edges */
+.page-profile .profile-form {
+  padding: 32px !important;
+  box-sizing: border-box !important;
+}
+
+/* Nuclear option - completely reset and rebuild the form layout */
+.page-profile .profile-form {
+  padding: 24px !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* Only target the specific form rows that need two-column layout */
+.page-profile .profile-form .form-row {
+  display: flex !important;
+  width: 100% !important;
+  margin: 0 0 16px 0 !important;
+  padding: 0 !important;
+  gap: 16px !important;
+}
+
+.page-profile .profile-form .form-row .form-group {
+  flex: 1 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Reset only inputs and labels to ensure consistent styling */
+.page-profile .profile-form .form-group {
+  margin-bottom: 16px !important;
+}
+
+.page-profile .profile-form .form-group label {
+  margin-bottom: 6px !important;
+}
+
+.page-profile .profile-form .form-group input,
+.page-profile .profile-form .form-group textarea,
+.page-profile .profile-form .form-group select {
+  margin: 0 !important;
+  padding: 12px 16px !important;
+}
+
+/* Restore normal spacing for profile stats */
+.page-profile .profile-stats {
+  margin-bottom: 18px !important;
+  gap: 14px !important;
+}
+
+.page-profile .stat-item {
+  padding: 8px 12px !important;
+  margin: 0 !important;
+}
+
+/* Restore normal spacing for form actions */
+.page-profile .form-actions {
+  margin-top: 20px !important;
+  padding: 0 !important;
+  display: flex !important;
+  gap: 12px !important;
+}
+
+.page-profile .form-actions .btn-compact {
+  padding: 10px 20px !important;
+}
+
+/* Restore normal spacing for profile picture section */
+.page-profile .profile-picture-section {
+  margin-bottom: 20px !important;
+  padding: 0 !important;
+}
+
+.page-profile .profile-info {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.page-profile .profile-details h3 {
+  margin-bottom: 6px !important;
+}
+
+.page-profile .profile-details .email {
+  margin-bottom: 12px !important;
+}
+
+.page-profile .profile-details .member-since {
+  margin-bottom: 12px !important;
+}
+
+.page-profile .profile-form .form-row .form-group:last-child {
+  margin-left: 0 !important;
+}

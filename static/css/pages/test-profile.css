@@ -1,0 +1,27 @@
+/*-----------------------------------
+  TEST PAGE - Profile Specific Test
+  
+  This test adds different style changes 
+  that should ONLY appear on the profile page
+-----------------------------------*/
+
+/* Test: Add bright blue border to profile header - should NOT affect other pages */
+.page-profile .profile-header {
+  border: 5px solid #0000ff !important;
+  background: rgba(0, 0, 255, 0.1) !important;
+  box-shadow: 0 0 20px rgba(0, 0, 255, 0.5) !important;
+}
+
+/* Test: Make profile avatar huge and yellow border - should NOT affect other avatars */
+.page-profile .profile-avatar {
+  border: 8px solid #ffff00 !important;
+  width: 200px !important;
+  height: 200px !important;
+  box-shadow: 0 0 30px rgba(255, 255, 0, 0.8) !important;
+}
+
+/* Test: Make profile stats orange - should NOT affect other stats */
+.page-profile .profile-stat {
+  background: rgba(255, 165, 0, 0.5) !important;
+  border: 3px solid orange !important;
+}

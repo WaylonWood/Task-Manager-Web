@@ -1,0 +1,202 @@
+/*-----------------------------------
+  Settings Page Specific Styles
+  
+  Only loaded on the settings page
+-----------------------------------*/
+
+/* Settings page specific styles */
+.page-settings .settings-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.page-settings .settings-header {
+  margin-bottom: 32px;
+}
+
+.page-settings .settings-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.page-settings .settings-subtitle {
+  color: var(--text-muted);
+  font-size: 1.1rem;
+}
+
+.page-settings .settings-sections {
+  display: grid;
+  gap: 24px;
+}
+
+.page-settings .settings-section {
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-glass);
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.page-settings .section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.page-settings .section-icon {
+  width: 40px;
+  height: 40px;
+  background: var(--primary-color);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.page-settings .section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.page-settings .section-description {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.page-settings .setting-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border-glass);
+}
+
+.page-settings .setting-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.page-settings .setting-info {
+  flex: 1;
+}
+
+.page-settings .setting-label {
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.page-settings .setting-description {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.page-settings .setting-control {
+  margin-left: 16px;
+}
+
+/* Unify Settings toggles with the global component and remove duplicate knob */
+.page-settings .toggle-switch {
+  /* Align size and base track color with global .toggle-switch */
+  width: 46px;
+  height: 26px;
+  border-radius: 13px;
+  background: rgba(120, 120, 128, 0.32);
+  position: relative;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+/* The old settings.css used a ::before circle which, combined with
+   the global .toggle-slider element, created a double white knob.
+   Hide that pseudo-element so only .toggle-slider renders. */
+.page-settings .toggle-switch::before,
+.page-settings .toggle-switch.active::before {
+  content: none !important;
+  display: none !important;
+}
+
+/* Keep active color consistent with the global toggle */
+.page-settings .toggle-switch.active {
+  background: #34C759;
+}
+
+.page-settings .setting-select {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-glass);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: var(--text-primary);
+  min-width: 120px;
+}
+
+.page-settings .danger-zone {
+  border: 1px solid var(--error-color);
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.page-settings .danger-zone .section-icon {
+  background: var(--error-color);
+}
+
+.page-settings .btn-danger {
+  background: var(--error-color);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.page-settings .btn-danger:hover {
+  background: #dc2626;
+  transform: translateY(-1px);
+}
+
+/* Settings page animations */
+.page-settings .settings-section {
+  animation: fadeInUp 0.6s ease;
+}
+
+.page-settings .settings-section:nth-child(1) { animation-delay: 0.1s; }
+.page-settings .settings-section:nth-child(2) { animation-delay: 0.2s; }
+.page-settings .settings-section:nth-child(3) { animation-delay: 0.3s; }
+.page-settings .settings-section:nth-child(4) { animation-delay: 0.4s; }
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive design for settings */
+@media (max-width: 768px) {
+  .page-settings .setting-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .page-settings .setting-control {
+    margin-left: 0;
+    align-self: flex-end;
+  }
+  
+  .page-settings .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+  }
+}

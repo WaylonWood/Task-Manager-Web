@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - Task Manager{% endblock %}
+
+{% block content %}
+<div class="header-section">
+    <div class="page-header">
+        <h1 class="gradient-text"><i class="fas fa-cog"></i> Application Settings</h1>
+        <p class="header-subtitle">Customize your task manager experience and preferences</p>
+    </div>
+</div>
+
+<div class="content-wrapper">
+  <form method="POST" class="modern-form settings-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <!-- Theme & Appearance Settings -->
+    <div class="settings-card">
+      <div class="card-icon">
+        <i class="fas fa-palette"></i>
+      </div>
+      <div class="card-content">
+        <h4>Theme & Appearance</h4>
+        <p>Customize how your task manager looks and feels</p>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="theme">Theme Preference</label>
+            <div class="select-wrapper">
+              <select id="theme" name="theme">
+                <option value="light" {{ 'selected' if (current_user.theme_preference or 'light') == 'light' else '' }}>
+                  Light Mode
+                </option>
+                <option value="dark" {{ 'selected' if (current_user.theme_preference or 'light') == 'dark' else '' }}>
+                  Dark Mode
+                </option>
+                <option value="auto" {{ 'selected' if (current_user.theme_preference or 'light') == 'auto' else '' }}>
+                  Auto (System)
+                </option>
+              </select>
+              <i class="fas fa-chevron-down select-arrow"></i>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="task-view">Task View Style</label>
+            <div class="select-wrapper">
+              <select id="task-view" name="task_view">
+                <option value="cards" {{ 'selected' if (current_user.task_view or 'cards') == 'cards' else '' }}>
+                  Card View
+                </option>
+                <option value="list" {{ 'selected' if (current_user.task_view or 'cards') == 'list' else '' }}>
+                  List View
+                </option>
+                <option value="compact" {{ 'selected' if (current_user.task_view or 'cards') == 'compact' else '' }}>
+                  Compact View
+                </option>
+              </select>
+              <i class="fas fa-chevron-down select-arrow"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notifications & Behavior Settings -->
+    <div class="settings-card">
+      <div class="card-icon">
+        <i class="fas fa-bell"></i>
+      </div>
+      <div class="card-content">
+        <h4>Notifications & Behavior</h4>
+        <p>Control how and when you receive notifications</p>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="notifications">Email Notifications</label>
+            <div class="select-wrapper">
+              <select id="notifications" name="notifications">
+                <option value="all" {{ 'selected' if (current_user.notifications or 'all') == 'all' else '' }}>
+                  All Notifications
+                </option>
+                <option value="important" {{ 'selected' if (current_user.notifications or 'all') == 'important' else '' }}>
+                  Important Only
+                </option>
+                <option value="none" {{ 'selected' if (current_user.notifications or 'all') == 'none' else '' }}>
+                  None
+                </option>
+              </select>
+              <i class="fas fa-chevron-down select-arrow"></i>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="default-filter">Default Task Filter</label>
+            <div class="select-wrapper">
+              <select id="default-filter" name="default_filter">
+                <option value="all" {{ 'selected' if (current_user.default_filter or 'all') == 'all' else '' }}>
+                  All Tasks
+                </option>
+                <option value="today" {{ 'selected' if (current_user.default_filter or 'all') == 'today' else '' }}>
+                  Today
+                </option>
+                <option value="upcoming" {{ 'selected' if (current_user.default_filter or 'all') == 'upcoming' else '' }}>
+                  Upcoming
+                </option>
+              </select>
+              <i class="fas fa-chevron-down select-arrow"></i>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-row toggle-row">
+          <div class="form-group toggle-group">
+            <div class="toggle-container">
+              <input type="checkbox" name="show_completed" {{ 'checked' if current_user.show_completed is not none and current_user.show_completed else 'checked' }} class="toggle-input" id="show-completed">
+              <label for="show-completed" class="toggle-switch">
+                <span class="toggle-slider"></span>
+              </label>
+              <label for="show-completed" class="toggle-label-text">Show completed tasks by default</label>
+            </div>
+          </div>
+          
+          <div class="form-group toggle-group">
+            <div class="toggle-container">
+              <input type="checkbox" name="enable_sounds" {{ 'checked' if current_user.enable_sounds is not none and current_user.enable_sounds else 'checked' }} class="toggle-input" id="enable-sounds">
+              <label for="enable-sounds" class="toggle-switch">
+                <span class="toggle-slider"></span>
+              </label>
+              <label for="enable-sounds" class="toggle-label-text">Enable notification sounds</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- User Information Card -->
+    <div class="settings-card">
+      <div class="card-icon">
+        <i class="fas fa-user-circle"></i>
+      </div>
+      <div class="card-content">
+        <h4>Account Information</h4>
+        <p>Your account details and statistics</p>
+        
+        <div class="account-info">
+          <div class="info-item">
+            <span class="label"><i class="fas fa-envelope"></i> Email:</span>
+            <span class="value">{{ current_user.email }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label"><i class="fas fa-user"></i> Full Name:</span>
+            <span class="value">{{ current_user.full_name or 'Not set' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label"><i class="fas fa-calendar-plus"></i> Member Since:</span>
+            <span class="value">{{ current_user.created_at.strftime('%B %d, %Y') }}</span>
+          </div>
+        </div>
+        
+        <div class="quick-actions">
+          <a href="{{ url_for('profile') }}" class="btn-outline">
+            <i class="fas fa-edit"></i>
+            Edit Profile
+          </a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="form-actions">
+      <button type="submit" class="btn-primary">
+        <i class="fas fa-save"></i>
+        Save All Settings
+      </button>
+      <a href="{{ url_for('index') }}" class="btn-secondary">
+        <i class="fas fa-arrow-left"></i>
+        Back to Tasks
+      </a>
+    </div>
+  </form>
+</div>
+
+<script>
+// Enhanced form interactions
+document.addEventListener('DOMContentLoaded', function() {
+  // Add smooth transitions to toggle switches
+  const toggles = document.querySelectorAll('.toggle-input');
+  toggles.forEach(toggle => {
+    toggle.addEventListener('change', function() {
+      const container = this.closest('.toggle-container');
+      if (this.checked) {
+        container.classList.add('active');
+      } else {
+        container.classList.remove('active');
+      }
+    });
+    
+    // Set initial state
+    const container = toggle.closest('.toggle-container');
+    if (toggle.checked) {
+      container.classList.add('active');
+    }
+  });
+  
+  // Add hover effects to cards
+  const cards = document.querySelectorAll('.settings-card');
+  cards.forEach(card => {
+    card.addEventListener('mouseenter', function() {
+      this.style.transform = 'translateY(-4px)';
+    });
+    
+    card.addEventListener('mouseleave', function() {
+      this.style.transform = 'translateY(-2px)';
+    });
+  });
+});
+</script>
+{% endblock %}

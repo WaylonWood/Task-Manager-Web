@@ -1,0 +1,76 @@
+{% extends "auth_base.html" %}
+
+{% block title %}Register - Task Manager{% endblock %}
+
+{% block content %}
+<div class="auth-form">
+  <div class="auth-header">
+    <h1 class="auth-title">Create your account</h1>
+    <p class="auth-subtitle">Join Task Manager to get started</p>
+  </div>
+  
+  <!-- Flash messages (unified with login.html) -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, msg in messages %}
+        {% set cls = 'flash-success' if category in ['success', 'ok'] else 'flash-error' %}
+        <div class="flash {{ cls }}">{{ msg }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+  
+  <form method="POST" action="{{ url_for('register') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="form-group">
+      <label class="form-label" for="email">Email</label>
+      <input class="form-input" type="email" id="email" name="email" placeholder="you@example.com" 
+             value="{{ request.form.email or '' }}" required autofocus>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="password">Password</label>
+      <input class="form-input" type="password" id="password" name="password" placeholder="Choose a strong password" required>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="confirm">Confirm Password</label>
+      <input class="form-input" type="password" id="confirm" name="confirm" placeholder="Repeat your password" required>
+    </div>
+
+    <button type="submit" class="btn-auth">Create Account</button>
+  </form>
+
+  <div class="auth-link">
+    Already have an account? <a href="{{ url_for('login') }}">Sign in</a>
+  </div>
+</div>
+
+<script>
+// Password confirmation validation (target actual form element)
+document.addEventListener('DOMContentLoaded', function() {
+  const password = document.getElementById('password');
+  const confirm = document.getElementById('confirm');
+  const form = document.querySelector('.auth-form form');
+  
+  function validatePasswordMatch() {
+    if (confirm.value && password.value !== confirm.value) {
+      confirm.setCustomValidity('Passwords do not match');
+      confirm.classList.add('auth-input-error');
+    } else {
+      confirm.setCustomValidity('');
+      confirm.classList.remove('auth-input-error');
+    }
+  }
+  
+  password.addEventListener('input', validatePasswordMatch);
+  confirm.addEventListener('input', validatePasswordMatch);
+  
+  form.addEventListener('submit', function(e) {
+    validatePasswordMatch();
+    if (!confirm.checkValidity()) {
+      e.preventDefault();
+    }
+  });
+});
+</script>
+{% endblock %}

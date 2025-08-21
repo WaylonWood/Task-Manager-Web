@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Create Workspace - Task Manager{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title">
+        <h1><i class="fas fa-plus-circle"></i> Create New Workspace</h1>
+        <p>Set up a new workspace to organize your projects and collaborate with your team</p>
+    </div>
+    <a href="{{ url_for('workspaces') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i>
+        Back to Workspaces
+    </a>
+</div>
+
+<div class="form-container">
+    <form method="POST" class="modern-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="form-header">
+            <h2><i class="fas fa-building"></i> Create New Workspace</h2>
+        </div>
+        
+        <div class="form-group required">
+            <label for="name">Workspace Name</label>
+            <input type="text" id="name" name="name" required 
+                   placeholder="e.g., Marketing Team, Product Development, Client Projects"
+                   value="{{ request.form.name if request.form }}">
+            <small class="form-hint">Choose a clear, descriptive name that your team will recognize</small>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" rows="4" 
+                      placeholder="Describe the purpose, goals, or scope of this workspace...">{{ request.form.description if request.form }}</textarea>
+            <small class="form-hint">Help team members understand what this workspace is for and what projects belong here</small>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-rocket"></i>
+                Create Workspace
+            </button>
+            <a href="{{ url_for('workspaces') }}" class="btn btn-secondary">
+                <i class="fas fa-times"></i>
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+    <h3>✨ What you can do with workspaces</h3>
+    <ul>
+        <li><i class="fas fa-folder-open"></i> <strong>Organize Projects:</strong> Group related projects together for better organization</li>
+        <li><i class="fas fa-users"></i> <strong>Team Collaboration:</strong> Invite team members and manage access permissions</li>
+        <li><i class="fas fa-shield-alt"></i> <strong>Access Control:</strong> Control who can see, edit, and manage your projects</li>
+        <li><i class="fas fa-expand-arrows-alt"></i> <strong>Scale Freely:</strong> Create unlimited workspaces for different teams or purposes</li>
+    </ul>
+</div>
+{% endblock %}

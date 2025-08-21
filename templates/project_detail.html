@@ -1,0 +1,375 @@
+{% extends "base.html" %}
+
+{% block title %}{{ project.name }} - Task Manager{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="project-header">
+        <div class="project-title">
+            <div class="project-color" style="background-color: {{ project.color }}"></div>
+            <h1>{{ project.name }}</h1>
+            {% if user_role == 'owner' %}
+                <span class="role-badge owner">
+                    <i class="fas fa-crown"></i> Owner
+                </span>
+            {% elif user_role == 'admin' %}
+                <span class="role-badge admin">
+                    <i class="fas fa-star"></i> Admin
+                </span>
+            {% else %}
+                <span class="role-badge member">
+                    <i class="fas fa-user"></i> Member
+                </span>
+            {% endif %}
+        </div>
+        {% if project.workspace %}
+            <div class="breadcrumb">
+                <a href="{{ url_for('workspace_detail', workspace_id=project.workspace.id) }}">
+                    {{ project.workspace.name }}
+                </a>
+                <span>/</span>
+                <span>{{ project.name }}</span>
+            </div>
+        {% endif %}
+    </div>
+    <div class="page-actions">
+        <button class="btn-primary" onclick="showTaskModal()">
+            <i class="fas fa-plus"></i>
+            Add Task
+        </button>
+        {% if user_role in ['owner', 'admin'] %}
+            <button class="btn-secondary" onclick="showMemberModal()">
+                <i class="fas fa-user-plus"></i>
+                Manage Members
+            </button>
+            {% if user_role == 'owner' %}
+                <button class="btn-danger" onclick="confirmDeleteProject()">
+                    <i class="fas fa-trash"></i>
+                    Delete Project
+                </button>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
+
+{% if project.description %}
+<div class="project-description">
+    <p>{{ project.description }}</p>
+</div>
+{% endif %}
+
+<div class="project-stats">
+    <div class="stat-card">
+        <div class="stat-number">{{ tasks | length }}</div>
+        <div class="stat-label">Total Tasks</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">
+            {% set completed_tasks = tasks | selectattr('completed', 'equalto', true) | list %}
+            {{ completed_tasks | length }}
+        </div>
+        <div class="stat-label">Completed</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">{{ project.members | length }}</div>
+        <div class="stat-label">Team Members</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">
+            {% if tasks | length > 0 %}
+                {{ ((completed_tasks | length / tasks | length) * 100) | int }}%
+            {% else %}
+                0%
+            {% endif %}
+        </div>
+        <div class="stat-label">Progress</div>
+    </div>
+</div>
+
+<div class="project-content">
+    <div class="tasks-section">
+        <h2>Tasks</h2>
+        
+        <div class="task-filters">
+            <button class="filter-btn active" data-filter="all">All Tasks</button>
+            <button class="filter-btn" data-filter="todo">To Do</button>
+            <button class="filter-btn" data-filter="in_progress">In Progress</button>
+            <button class="filter-btn" data-filter="review">Review</button>
+            <button class="filter-btn" data-filter="completed">Completed</button>
+        </div>
+
+        {% if tasks %}
+            <div class="tasks-list">
+                {% for task in tasks %}
+                <div class="task-item" data-status="{{ task.status }}">
+                    <div class="task-content">
+                        <div class="task-header">
+                            <h3 class="task-title">{{ task.title }}</h3>
+                            <div class="task-meta">
+                                <span class="task-status status-{{ task.status }}">{{ task.status | replace('_', ' ') | title }}</span>
+                                <span class="task-priority priority-{{ task.priority }}">{{ task.priority | title }}</span>
+                            </div>
+                        </div>
+                        {% if task.description %}
+                            <p class="task-description">{{ task.description }}</p>
+                        {% endif %}
+                        <div class="task-details">
+                            {% if task.assignee %}
+                                <span class="task-assignee">
+                                    <i class="fas fa-user"></i>
+                                    {{ task.assignee.full_name or task.assignee.email }}
+                                </span>
+                            {% endif %}
+                            {% if task.due %}
+                                <span class="task-due {% if task.due < today and not task.completed %}overdue{% endif %}">
+                                    <i class="fas fa-calendar"></i>
+                                    {{ task.due.strftime('%B %d, %Y') }}
+                                </span>
+                            {% endif %}
+                        </div>
+                        {% if task.subtasks %}
+                            <div class="subtasks">
+                                {% for subtask in task.subtasks %}
+                                    <div class="subtask {% if subtask.completed %}completed{% endif %}">
+                                        <i class="fas fa-{{ 'check-square' if subtask.completed else 'square' }}"></i>
+                                        {{ subtask.title }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="task-actions">
+                        {% if not task.completed %}
+                            <form method="POST" action="{{ url_for('complete_task', tid=task.id) }}" style="display: inline;">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-success btn-sm">
+                                    <i class="fas fa-check"></i>
+                                    Complete
+                                </button>
+                            </form>
+                        {% endif %}
+                        <button class="btn btn-secondary btn-sm" onclick="editTask({{ task.id }})">
+                            <i class="fas fa-edit"></i>
+                            Edit
+                        </button>
+                        <form method="POST" action="{{ url_for('delete_task', tid=task.id) }}" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this task?')">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-danger btn-sm">
+                                <i class="fas fa-trash"></i>
+                                Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-tasks"></i>
+                </div>
+                <h3>No tasks yet</h3>
+                <p>Create your first task to get started with this project.</p>
+                <button class="btn btn-primary" onclick="showTaskModal()">
+                    <i class="fas fa-plus"></i>
+                    Add First Task
+                </button>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="members-section">
+        <h2>Team Members</h2>
+        <div class="members-list">
+            {% for member in project.members %}
+                <div class="member-item">
+                    <div class="member-avatar">
+                        {% if member.profile_picture %}
+                            <img src="{{ url_for('uploaded_file', filename=member.profile_picture) }}" 
+                                 alt="{{ member.full_name or 'User' }}">
+                        {% else %}
+                            <div class="avatar-placeholder">
+                                {% if member.full_name %}
+                                    {{ member.full_name[0] | upper }}
+                                {% else %}
+                                    {{ member.email[0] | upper }}
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="member-info">
+                        <div class="member-name">
+                            {{ member.full_name or 'User' }}
+                        </div>
+                        {% set member_role = member.get_role_in_project(project.id) %}
+                        <div class="member-role">
+                            {% if member_role == 'owner' %}
+                                <span class="role-badge owner">
+                                    <i class="fas fa-crown"></i> Owner
+                                </span>
+                            {% elif member_role == 'admin' %}
+                                <span class="role-badge admin">
+                                    <i class="fas fa-star"></i> Admin
+                                </span>
+                            {% else %}
+                                <span class="role-badge member">
+                                    <i class="fas fa-user"></i> Member
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% if user_role in ['owner', 'admin'] and member_role != 'owner' %}
+                        <div class="member-actions">
+                            <button class="btn-icon" onclick="removeMember({{ member.id }})">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Task Modal (updated) -->
+<div id="taskModal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <form method="POST" action="{{ url_for('add_task') }}" class="modern-form compact add-task-form">
+      <div class="form-header">
+        <h3><i class="fas fa-plus-circle"></i> Add New Task</h3>
+        <button type="button" class="close-btn" onclick="hideTaskModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <input type="hidden" name="project_id" value="{{ project.id }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+      <div class="form-group required">
+        <label for="task">Task Title</label>
+        <input type="text" id="task" name="task" required placeholder="Enter task description...">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="due">Due Date</label>
+          <input type="date" id="due" name="due" placeholder="mm/dd/yyyy">
+        </div>
+        <div class="form-group">
+          <label for="priority">Priority</label>
+          <div class="select-wrapper">
+            <select id="priority" name="priority">
+              <option value="low">🟢 Low</option>
+              <option value="medium" selected>🟡 Medium</option>
+              <option value="high">🔴 High</option>
+            </select>
+            <span class="select-arrow"><i class="fas fa-chevron-down"></i></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-check"></i>
+          Add Task
+        </button>
+        <button type="button" onclick="hideTaskModal()" class="btn btn-secondary">
+          <i class="fas fa-times"></i>
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Member Modal (placeholder) -->
+<div id="memberModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <h3>Manage Members</h3>
+        <p>Member management feature coming soon!</p>
+        <button onclick="hideMemberModal()" class="btn btn-secondary">Close</button>
+    </div>
+</div>
+
+<!-- Delete Project Confirmation Modal -->
+<div id="deleteProjectModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-exclamation-triangle"></i> Delete Project</h3>
+            <button type="button" class="btn-icon modal-close" onclick="hideDeleteProjectModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <p>Are you sure you want to delete the project "<strong>{{ project.name }}</strong>"?</p>
+            <p class="warning-text">This action cannot be undone. All tasks and data associated with this project will be permanently deleted.</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="hideDeleteProjectModal()">Cancel</button>
+            <form method="POST" action="{{ url_for('delete_project', project_id=project.id) }}" style="display: inline;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Delete Project
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function showTaskModal() {
+  // Use flex so the modal centers (matches other modals)
+  document.getElementById('taskModal').style.display = 'flex';
+}
+
+function hideTaskModal() {
+  document.getElementById('taskModal').style.display = 'none';
+}
+
+function showMemberModal() {
+  document.getElementById('memberModal').style.display = 'flex';
+}
+
+function hideMemberModal() {
+  document.getElementById('memberModal').style.display = 'none';
+}
+
+function confirmDeleteProject() {
+  document.getElementById('deleteProjectModal').style.display = 'flex';
+}
+
+function hideDeleteProjectModal() {
+  document.getElementById('deleteProjectModal').style.display = 'none';
+}
+
+function editTask(taskId) {
+  // Placeholder for task editing functionality
+  alert('Task editing feature coming soon!');
+}
+
+// Task filtering
+document.addEventListener('DOMContentLoaded', function() {
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const taskItems = document.querySelectorAll('.task-item');
+    
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Update active filter
+            filterBtns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            
+            const filter = this.dataset.filter;
+            
+            // Show/hide tasks based on filter
+            taskItems.forEach(task => {
+                if (filter === 'all' || task.dataset.status === filter) {
+                    task.style.display = 'block';
+                } else {
+                    task.style.display = 'none';
+                }
+            });
+        });
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,26 @@
+/*-----------------------------------
+  TEST PAGE - Dashboard Specific Test
+  
+  This test adds a distinct style change 
+  that should ONLY appear on the dashboard
+-----------------------------------*/
+
+/* Test: Add bright red border to dashboard stats - should NOT affect other pages */
+.page-index .dashboard-stats {
+  border: 5px solid #ff0000 !important;
+  background: rgba(255, 0, 0, 0.1) !important;
+  border-radius: 20px !important;
+}
+
+/* Test: Make dashboard stat cards purple - should NOT affect other cards */
+.page-index .stat-card {
+  background: rgba(128, 0, 128, 0.3) !important;
+  border: 2px solid purple !important;
+}
+
+/* Test: Make dashboard titles huge and green - should NOT affect other titles */
+.page-index .gradient-text {
+  color: #00ff00 !important;
+  font-size: 4rem !important;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5) !important;
+}

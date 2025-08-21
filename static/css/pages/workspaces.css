@@ -1,0 +1,184 @@
+/*-----------------------------------
+  Workspaces Page Specific Styles
+  
+  Only loaded on the workspaces page
+-----------------------------------*/
+
+/* Workspaces page specific styles */
+.page-workspaces .workspaces-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)) !important;
+  gap: 32px !important;
+  margin-top: 32px;
+}
+
+.page-workspaces .workspace-card {
+  min-height: 200px;
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-glass);
+  border-radius: 16px;
+  padding: 24px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.page-workspaces .workspace-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--border-glass-hover);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+}
+
+.page-workspaces .workspace-name {
+  color: var(--text-primary);
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.page-workspaces .workspace-description {
+  color: var(--text-muted);
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.page-workspaces .workspace-stats {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.page-workspaces .workspace-stat {
+  background: var(--bg-secondary);
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.page-workspaces .workspace-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: auto;
+}
+
+.page-workspaces .workspace-members {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.page-workspaces .member-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid var(--bg-primary);
+  margin-left: -8px;
+}
+
+.page-workspaces .member-avatar:first-child {
+  margin-left: 0;
+}
+
+.page-workspaces .member-count {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  margin-left: 8px;
+}
+
+/* Workspace header */
+.page-workspaces .workspaces-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.page-workspaces .workspaces-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.page-workspaces .workspaces-subtitle {
+  color: var(--text-muted);
+  margin-top: 8px;
+}
+
+/* Workspace filters */
+.page-workspaces .workspace-filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.page-workspaces .filter-btn {
+  padding: 8px 16px;
+  border: 1px solid var(--border-glass);
+  background: var(--bg-glass);
+  color: var(--text-primary);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.page-workspaces .filter-btn.active {
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+.page-workspaces .filter-btn:hover {
+  border-color: var(--border-glass-hover);
+}
+
+/* Workspaces page animations */
+.page-workspaces .workspace-card {
+  animation: fadeInUp 0.6s ease;
+}
+
+.page-workspaces .workspace-card:nth-child(1) { animation-delay: 0.1s; }
+.page-workspaces .workspace-card:nth-child(2) { animation-delay: 0.2s; }
+.page-workspaces .workspace-card:nth-child(3) { animation-delay: 0.3s; }
+.page-workspaces .workspace-card:nth-child(4) { animation-delay: 0.4s; }
+.page-workspaces .workspace-card:nth-child(5) { animation-delay: 0.5s; }
+.page-workspaces .workspace-card:nth-child(6) { animation-delay: 0.6s; }
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive design for workspaces */
+@media (max-width: 768px) {
+  .page-workspaces .workspaces-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  
+  .page-workspaces .workspaces-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  
+  .page-workspaces .workspace-filters {
+    flex-wrap: wrap;
+  }
+  
+  .page-workspaces .workspace-stats {
+    flex-direction: column;
+    gap: 8px;
+  }
+}

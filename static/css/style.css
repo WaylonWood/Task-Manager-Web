@@ -1,0 +1,145 @@
+/*-----------------------------------
+  Task Manager - Core CSS
+  
+  This file contains only shared styles
+  that are used across multiple pages.
+  Page-specific styles are in css/pages/
+-----------------------------------*/
+
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Import Font Awesome */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+
+/* Core Styles - shared variables, base elements */
+@import url('base.css');
+
+/* Layout & Navigation - shared across authenticated pages */
+@import url('layout.css');
+
+/* Reusable Components - buttons, forms, modals, etc. */
+@import url('components.css');
+
+/*-----------------------------------
+  Utility Classes
+-----------------------------------*/
+
+/* Spacing */
+.p-0 { padding: 0; }
+.p-1 { padding: 0.5rem; }
+.p-2 { padding: 1rem; }
+.p-3 { padding: 1.5rem; }
+.p-4 { padding: 2rem; }
+
+.m-0 { margin: 0; }
+.m-1 { margin: 0.5rem; }
+.m-2 { margin: 1rem; }
+.m-3 { margin: 1.5rem; }
+.m-4 { margin: 2rem; }
+
+/* Display */
+.d-none { display: none; }
+.d-block { display: block; }
+.d-flex { display: flex; }
+.d-grid { display: grid; }
+
+/* Flexbox */
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.align-center { align-items: center; }
+.flex-wrap { flex-wrap: wrap; }
+.flex-1 { flex: 1; }
+
+/* Text */
+.text-left { text-align: left; }
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+
+.text-primary { color: var(--primary-color); }
+.text-secondary { color: var(--secondary-color); }
+.text-success { color: var(--success-color); }
+.text-error { color: var(--error-color); }
+.text-warning { color: var(--warning-color); }
+
+/* Background */
+.bg-glass { background: var(--bg-glass); }
+.bg-primary { background: var(--primary-color); }
+.bg-secondary { background: var(--secondary-color); }
+
+/* Border */
+.border-glass { border: 1px solid var(--border-glass); }
+.border-primary { border: 1px solid var(--primary-color); }
+.border-secondary { border: 1px solid var(--secondary-color); }
+
+/* Border Radius */
+.rounded { border-radius: 8px; }
+.rounded-lg { border-radius: 12px; }
+.rounded-xl { border-radius: 16px; }
+.rounded-2xl { border-radius: 20px; }
+.rounded-full { border-radius: 50%; }
+
+/*-----------------------------------
+  Animation Overrides
+-----------------------------------*/
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus styles for accessibility */
+*:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+button:focus,
+a:focus,
+input:focus,
+textarea:focus,
+select:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/*-----------------------------------
+  Print Styles
+-----------------------------------*/
+
+@media print {
+  .sidebar,
+  .page-actions,
+  .btn-primary,
+  .btn-secondary,
+  .btn-danger,
+  .dropdown,
+  .modal {
+    display: none !important;
+  }
+  
+  .main-content {
+    margin-left: 0 !important;
+    padding: 0 !important;
+  }
+  
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  
+  .project-card,
+  .workspace-card,
+  .task-item {
+    border: 1px solid #ccc !important;
+    background: white !important;
+    color: black !important;
+    page-break-inside: avoid;
+  }
+}

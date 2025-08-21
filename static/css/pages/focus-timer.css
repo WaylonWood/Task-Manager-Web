@@ -1,0 +1,126 @@
+/*-----------------------------------
+  Focus Timer Page Specific Styles
+  
+  Only loaded on the focus timer page
+-----------------------------------*/
+
+/* Focus Timer specific styles */
+.page-focus_timer .timer-display {
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-glass);
+  border-radius: 16px;
+  padding: 40px;
+  text-align: center;
+  margin-bottom: 32px;
+  position: relative;
+  overflow: hidden;
+}
+
+.page-focus_timer .timer-display::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, 
+    rgba(59, 130, 246, 0.02) 0%, 
+    rgba(139, 92, 246, 0.02) 50%,
+    rgba(6, 182, 212, 0.02) 100%);
+  pointer-events: none;
+}
+
+.page-focus_timer .timer-time {
+  font-size: 4rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 24px;
+}
+
+/* Focus timer controls */
+.page-focus_timer .timer-controls {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-bottom: 32px;
+}
+
+.page-focus_timer .timer-btn {
+  padding: 12px 24px;
+  border-radius: 12px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-glass);
+  color: var(--text-primary);
+}
+
+.page-focus_timer .timer-btn:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-glass-hover);
+}
+
+.page-focus_timer .timer-btn.active {
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+/* Focus timer sessions */
+.page-focus_timer .timer-sessions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  margin-top: 32px;
+}
+
+.page-focus_timer .session-card {
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-glass);
+  border-radius: 16px;
+  padding: 24px;
+  transition: all 0.3s ease;
+}
+
+.page-focus_timer .session-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-glass-hover);
+}
+
+/* Focus timer animations */
+.page-focus_timer .timer-display {
+  animation: timerPulse 2s ease-in-out infinite alternate;
+}
+
+@keyframes timerPulse {
+  from {
+    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.1);
+  }
+  to {
+    box-shadow: 0 8px 40px rgba(59, 130, 246, 0.2);
+  }
+}
+
+/* Responsive design for focus timer */
+@media (max-width: 768px) {
+  .page-focus_timer .timer-time {
+    font-size: 3rem;
+  }
+  
+  .page-focus_timer .timer-controls {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .page-focus_timer .timer-sessions {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+  <title>{% block title %}Task Manager{% endblock %}</title>
+  
+  <!-- Early theme bootstrap to avoid white flash -->
+  <script>
+    (function() {
+      try {
+        var t = localStorage.getItem('theme');
+        var theme = (t === 'dark') ? 'dark' : 'light';
+        document.documentElement.classList.add(theme);
+      } catch (e) {
+        document.documentElement.classList.add('light');
+      }
+    })();
+  </script>
+  <!-- Critical CSS: keep dark-mode auth inputs brand-tinted on first paint -->
+  <style>
+    html.dark .auth-form .form-input { 
+      background-color: #e9ecff !important; /* matches brand tint */
+      color: #000 !important; 
+      -webkit-text-fill-color: #000 !important; 
+      caret-color: #000 !important; 
+      font-size: 16px !important;
+      font-weight: 400 !important;
+      letter-spacing: 0 !important;
+    }
+    html.dark .auth-form .form-input::placeholder { color: rgba(0,0,0,0.55) !important; font-size: 16px !important; font-weight: 400 !important; letter-spacing: 0 !important; }
+  </style>
+  
+  <!-- Inter font -->
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  
+  <!-- Core CSS (shared across all pages) -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v='20250810-4') }}">
+  
+  <!-- Auth-specific CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/auth.css', v='20250810-4') }}">
+</head>
+<body class="light auth-body page-{{ request.endpoint or 'auth' }}">
+  <script>
+    // Set initial theme ASAP to avoid white flash (body class sync)
+    (function() {
+      try {
+        var t = localStorage.getItem('theme');
+        if (t === 'dark') {
+          document.body.classList.remove('light');
+          document.body.classList.add('dark');
+        }
+      } catch (e) {}
+    })();
+  </script>
+  <div class="auth-container">
+    <!-- Background elements that match auth.css -->
+    <div class="auth-bg"></div>
+    <div class="floating-elements">
+      <div class="floating-element"></div>
+      <div class="floating-element"></div>
+      <div class="floating-element"></div>
+    </div>
+    
+    <!-- Dark mode toggle -->
+    <button class="dark-mode-toggle" id="authDarkToggle">
+      <i class="fas fa-moon"></i>
+    </button>
+    
+    {% block content %}{% endblock %}
+  </div>
+  
+  <script>
+    // Dark mode toggle functionality
+    const authDarkToggle = document.getElementById('authDarkToggle');
+    const body = document.body;
+    
+    // Check for saved theme preference
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+      body.classList.remove('light');
+      body.classList.add('dark');
+      authDarkToggle.innerHTML = '<i class="fas fa-sun"></i>';
+    }
+    
+    authDarkToggle.addEventListener('click', () => {
+      if (body.classList.contains('dark')) {
+        body.classList.remove('dark');
+        body.classList.add('light');
+        document.documentElement.classList.remove('dark');
+        document.documentElement.classList.add('light');
+        authDarkToggle.innerHTML = '<i class="fas fa-moon"></i>';
+        localStorage.setItem('theme', 'light');
+      } else {
+        body.classList.remove('light');
+        body.classList.add('dark');
+        document.documentElement.classList.remove('light');
+        document.documentElement.classList.add('dark');
+        authDarkToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        localStorage.setItem('theme', 'dark');
+      }
+    });
+
+    // Enhanced form interactions
+    document.addEventListener('DOMContentLoaded', function() {
+      // Add loading state to submit buttons
+      const forms = document.querySelectorAll('.auth-form form');
+      forms.forEach(form => {
+        form.addEventListener('submit', function() {
+          const submitBtn = form.querySelector('.btn-auth');
+          if (submitBtn) {
+            submitBtn.classList.add('loading');
+          }
+        });
+      });
+
+      // Enhanced input focus effects
+      const inputs = document.querySelectorAll('.auth-form input');
+      inputs.forEach(input => {
+        input.addEventListener('input', function() {
+          if (this.validity.valid) {
+            this.classList.remove('auth-input-error');
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>

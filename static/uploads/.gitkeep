@@ -1,0 +1,2 @@
+# This file keeps the uploads directory in git while ignoring its contents
+# User uploaded files will be stored here locally but not committed to git

@@ -1,0 +1,341 @@
+{% extends "base.html" %}
+
+{% block title %}{{ workspace.name }} - Task Manager{% endblock %}
+
+{% block content %}
+<!-- Dashboard Header -->
+<div class="dashboard-header">
+  <div class="header-content">
+    <div class="page-title-section">
+      <h1 class="gradient-text">
+        <i class="fas fa-building"></i> 
+        {{ workspace.name }}
+      </h1>
+      {% if workspace.description %}
+      <p class="page-subtitle">{{ workspace.description }}</p>
+      {% else %}
+      <p class="page-subtitle">Workspace overview and project management</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Main Workspace Section -->
+<div class="workspace-detail-section">
+  <!-- Projects Section -->
+  <div class="task-section">
+    <div class="section-header">
+      <h3 class="section-title-modern">
+        <i class="fas fa-folder-open"></i>
+        Projects
+        <span class="task-count-badge">{{ projects | length }}</span>
+      </h3>
+      <div class="workspace-actions-group">
+        <a href="{{ url_for('create_project') }}?workspace_id={{ workspace.id }}" class="btn-compact btn-primary">
+          <i class="fas fa-plus"></i>
+          <span>New Project</span>
+        </a>
+        {% if workspace.owner_id == current_user.id %}
+        <button class="btn-compact" onclick="showInviteModal()">
+          <i class="fas fa-user-plus"></i>
+          <span>Invite</span>
+        </button>
+        <button class="btn-compact btn-danger" onclick="confirmDeleteWorkspace()">
+          <i class="fas fa-trash"></i>
+          <span>Delete</span>
+        </button>
+        {% endif %}
+      </div>
+    </div>
+    
+    {% if projects %}
+    <div id="projectsList" class="tasks-grid">
+      {% for project in projects %}
+      <div class="task-card" data-project-id="{{ project.id }}">
+        <div class="task-card-inner">
+          <!-- Project Card Main Content -->
+          <div class="task-card-main">
+            <!-- Project Card Header -->
+            <div class="task-card-header">
+              <div class="project-title-section">
+                <div class="project-color-indicator" style="background-color: {{ project.color }}"></div>
+                <h3 class="task-title">{{ project.name }}</h3>
+              </div>
+              {% set user_role = current_user.get_role_in_project(project.id) %}
+              {% if user_role == 'owner' %}
+              <div class="task-priority-badge priority-high">
+                <i class="fas fa-crown"></i>
+                Owner
+              </div>
+              {% else %}
+              <div class="task-priority-badge priority-low">
+                <i class="fas fa-user"></i>
+                Member
+              </div>
+              {% endif %}
+            </div>
+            
+            <!-- Project Card Content -->
+            <div class="task-card-content">
+              {% if project.description %}
+              <div class="task-description">
+                <p>{{ project.description }}</p>
+              </div>
+              {% endif %}
+              
+              <div class="task-meta">
+                <span class="task-due">
+                  <i class="fas fa-tasks"></i>
+                  {{ project.tasks | length }} tasks
+                </span>
+                <span class="task-created">
+                  <i class="fas fa-users"></i>
+                  {{ project.members | length }} members
+                </span>
+                <span class="task-created">
+                  <i class="fas fa-calendar"></i>
+                  Created {{ project.created_at.strftime('%m/%d') }}
+                </span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Project Card Actions (Right Side) -->
+          <div class="task-card-actions">
+            <a href="{{ url_for('project_detail', project_id=project.id) }}" class="btn-compact btn-success">
+              <i class="fas fa-eye"></i>
+              <span>View</span>
+            </a>
+            {% if user_role == 'owner' %}
+            <button class="btn-compact btn-danger" onclick="confirmDeleteProject({{ project.id }}, '{{ project.name }}')">
+              <i class="fas fa-trash"></i>
+              <span>Delete</span>
+            </button>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state-modern">
+      <div class="empty-content">
+        <div class="empty-icon">
+          <i class="fas fa-folder-open"></i>
+        </div>
+        <h3>No projects yet</h3>
+        <p>Create your first project to start organizing your work.</p>
+        <a href="{{ url_for('create_project') }}?workspace_id={{ workspace.id }}" class="btn-compact btn-primary">
+          <i class="fas fa-plus"></i>
+          <span>Create First Project</span>
+        </a>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Members Section -->
+  <div class="task-section">
+    <div class="section-header">
+      <h3 class="section-title-modern">
+        <i class="fas fa-users"></i>
+        Members
+      </h3>
+      <div class="workspace-role-badge">
+        {% if workspace.owner_id == current_user.id %}
+        <div class="task-priority-badge priority-high">
+          <i class="fas fa-crown"></i>
+          Owner
+        </div>
+        {% else %}
+        <div class="task-priority-badge priority-low">
+          <i class="fas fa-user"></i>
+          Member
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    
+    <div class="members-grid">
+      <!-- Workspace Owner -->
+      <div class="member-card owner-card">
+        <div class="member-card-inner">
+          <div class="member-avatar">
+            {% if workspace.owner.profile_picture %}
+            <img src="{{ url_for('uploaded_file', filename=workspace.owner.profile_picture) }}" 
+                 alt="{{ workspace.owner.full_name or workspace.owner.email }}">
+            {% else %}
+            <div class="avatar-placeholder">
+              {{ (workspace.owner.full_name or workspace.owner.email)[0] | upper }}
+            </div>
+            {% endif %}
+          </div>
+          <div class="member-info">
+            <h4 class="member-name">{{ workspace.owner.full_name or workspace.owner.email }}</h4>
+            <div class="member-role-badge owner">
+              <i class="fas fa-crown"></i>
+              Owner
+            </div>
+            <div class="member-meta">
+              <span class="member-joined">
+                <i class="fas fa-calendar"></i>
+                Created {{ workspace.created_at.strftime('%m/%d/%Y') }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Other Members -->
+      {% for member in workspace.members %}
+      {% if member.id != workspace.owner_id %}
+      <div class="member-card">
+        <div class="member-card-inner">
+          <div class="member-avatar">
+            {% if member.profile_picture %}
+            <img src="{{ url_for('uploaded_file', filename=member.profile_picture) }}" 
+                 alt="{{ member.full_name or member.email }}">
+            {% else %}
+            <div class="avatar-placeholder">
+              {{ (member.full_name or member.email)[0] | upper }}
+            </div>
+            {% endif %}
+          </div>
+          <div class="member-info">
+            <h4 class="member-name">{{ member.full_name or member.email }}</h4>
+            <div class="member-role-badge member">
+              <i class="fas fa-user"></i>
+              Member
+            </div>
+            <div class="member-meta">
+              <span class="member-joined">
+                <i class="fas fa-user-plus"></i>
+                Joined member
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- Invite Modal -->
+<div id="inviteModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-user-plus"></i> Invite Members</h3>
+            <button type="button" class="btn-icon modal-close" onclick="hideInviteModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <p>Member invitation feature coming soon!</p>
+            <p>You'll be able to invite team members to collaborate on this workspace.</p>
+        </div>
+        <div class="modal-footer">
+            <button onclick="hideInviteModal()" class="btn-compact btn-outline">
+                <i class="fas fa-times"></i>
+                <span>Close</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Workspace Confirmation Modal -->
+<div id="deleteWorkspaceModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-exclamation-triangle"></i> Delete Workspace</h3>
+            <button type="button" class="btn-icon modal-close" onclick="hideDeleteWorkspaceModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <p>Are you sure you want to delete the workspace "<strong>{{ workspace.name }}</strong>"?</p>
+            <p class="warning-text">This action cannot be undone. All projects, tasks, and data in this workspace will be permanently deleted.</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn-compact btn-outline" onclick="hideDeleteWorkspaceModal()">
+                <i class="fas fa-times"></i>
+                <span>Cancel</span>
+            </button>
+            <form method="POST" action="{{ url_for('delete_workspace', workspace_id=workspace.id) }}" style="display: inline;">
+                <button type="submit" class="btn-compact btn-danger">
+                    <i class="fas fa-trash"></i>
+                    <span>Delete Workspace</span>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function showInviteModal() {
+    document.getElementById('inviteModal').style.display = 'block';
+}
+
+function hideInviteModal() {
+    document.getElementById('inviteModal').style.display = 'none';
+}
+
+function confirmDeleteWorkspace() {
+    document.getElementById('deleteWorkspaceModal').style.display = 'flex';
+}
+
+function hideDeleteWorkspaceModal() {
+    document.getElementById('deleteWorkspaceModal').style.display = 'none';
+}
+
+function confirmDeleteProject(projectId, projectName) {
+    if (confirm(`Are you sure you want to delete the project "${projectName}"? This action cannot be undone.`)) {
+        // Create a form and submit it
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/project/${projectId}/delete`;
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+// Close modals when clicking outside
+document.addEventListener('DOMContentLoaded', function() {
+    const modals = document.querySelectorAll('.modal');
+    modals.forEach(modal => {
+        modal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.style.display = 'none';
+            }
+        });
+    });
+
+    // Dropdown functionality
+    const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
+    
+    dropdownToggles.forEach(toggle => {
+        toggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const dropdown = this.closest('.dropdown');
+            const menu = dropdown.querySelector('.dropdown-menu');
+            
+            // Close other dropdowns
+            document.querySelectorAll('.dropdown-menu').forEach(m => {
+                if (m !== menu) m.style.display = 'none';
+            });
+            
+            // Toggle current dropdown
+            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        });
+    });
+    
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function() {
+        document.querySelectorAll('.dropdown-menu').forEach(menu => {
+            menu.style.display = 'none';
+        });
+    });
+});
+</script>
+{% endblock %}

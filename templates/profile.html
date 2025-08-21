@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - Task Manager{% endblock %}
+
+{% block content %}
+<!-- Page Header aligned with app layout -->
+<div class="page-header">
+  <div class="page-title-section">
+    <h1 class="gradient-text">
+      <i class="fas fa-user"></i>
+      Profile Settings
+    </h1>
+    <p class="page-subtitle">Manage your account information and preferences</p>
+  </div>
+  <div class="page-actions">
+    <a href="{{ url_for('index') }}" class="btn-compact btn-outline">
+      <i class="fas fa-arrow-left"></i>
+      <span>Back to Tasks</span>
+    </a>
+  </div>
+</div>
+
+<!-- Profile Form Section -->
+<div class="profile-section">
+  <form method="POST" enctype="multipart/form-data" class="profile-form" id="profile-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="profile-picture-section">
+        <div class="current-picture" onclick="document.getElementById('profile-picture').click()">
+          {% if current_user.profile_picture %}
+            <img src="{{ url_for('uploaded_file', filename=current_user.profile_picture) }}" alt="Profile Picture" class="profile-preview" id="profile-preview">
+          {% else %}
+            <div class="profile-placeholder" id="profile-placeholder">
+              <i class="fas fa-user"></i>
+            </div>
+          {% endif %}
+          <input id="profile-picture" name="profile_picture" type="file" accept="image/*" style="display: none;">
+        </div>
+        
+        <div class="profile-info">
+          <div class="profile-details">
+            <h3>{{ current_user.full_name or 'User Profile' }}</h3>
+            <p class="email">{{ current_user.email }}</p>
+            <p class="member-since">
+              <i class="fas fa-calendar-alt"></i>
+              Member since {{ current_user.created_at.strftime('%B %Y') if current_user.created_at else 'Recently' }}
+            </p>
+          </div>
+          
+          <div class="profile-stats">
+            <div class="stat-item">
+              <div class="stat-number">{{ current_user.tasks|length if current_user.tasks else 0 }}</div>
+              <div class="stat-label">Total Tasks</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number">{{ current_user.projects|length if current_user.projects else 0 }}</div>
+              <div class="stat-label">Projects</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number">{{ current_user.workspaces|length if current_user.workspaces else 0 }}</div>
+              <div class="stat-label">Workspaces</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="picture-upload">
+          {% if current_user.profile_picture %}
+            <!-- Use a single form; submit to removal endpoint with formaction -->
+            <button type="submit"
+                    class="remove-btn"
+                    formaction="{{ url_for('remove_profile_picture') }}"
+                    formmethod="POST"
+                    formnovalidate
+                    onclick="return confirm('Are you sure you want to remove your profile picture?')">
+              <i class="fas fa-trash"></i>
+              Remove
+            </button>
+          {% endif %}
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="full-name">Full Name</label>
+          <input id="full-name" name="full_name" type="text" value="{{ current_user.full_name or '' }}" placeholder="Enter your full name">
+        </div>
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input id="email" name="email" type="email" value="{{ current_user.email }}" required>
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="current-password">Current Password</label>
+          <input id="current-password" name="current_password" type="password" placeholder="Enter current password" autocomplete="current-password">
+          <span class="form-hint">Enter your current password to save changes to your email or password.</span>
+        </div>
+        <div class="form-group">
+          <label for="new-password">New Password</label>
+          <input id="new-password" name="new_password" type="password" placeholder="Leave blank to keep current password">
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="confirm-password">Confirm New Password</label>
+        <input id="confirm-password" name="confirm_password" type="password" placeholder="Confirm new password">
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn-compact btn-primary">
+          <i class="fas fa-save"></i>
+          <span>Save Changes</span>
+        </button>
+        <!-- Removed duplicate in-form back link; header provides Back to Tasks -->
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+// Profile picture preview and auto-upload (null-safe, no dependency on .upload-btn)
+document.getElementById('profile-picture').addEventListener('change', function(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const uploadBtnSpan = document.querySelector('.upload-btn span');
+  const originalText = uploadBtnSpan ? uploadBtnSpan.textContent : null;
+  if (uploadBtnSpan) uploadBtnSpan.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const preview = document.getElementById('profile-preview');
+    const placeholder = document.getElementById('profile-placeholder');
+
+    if (preview) {
+      preview.src = e.target.result;
+    } else if (placeholder) {
+      placeholder.innerHTML = `<img src="${e.target.result}" alt="Profile Preview" class="profile-preview" id="profile-preview">`;
+    }
+
+    // Ensure a remove button exists without inserting a nested form
+    const pictureUpload = document.querySelector('.picture-upload');
+    if (pictureUpload && !document.querySelector('.remove-btn')) {
+      const removeBtn = document.createElement('button');
+      removeBtn.type = 'submit';
+      removeBtn.className = 'remove-btn';
+      removeBtn.setAttribute('formaction', '{{ url_for("remove_profile_picture") }}');
+      removeBtn.setAttribute('formmethod', 'POST');
+      removeBtn.setAttribute('formnovalidate', '');
+      removeBtn.onclick = () => confirm('Are you sure you want to remove your profile picture?');
+      removeBtn.innerHTML = '<i class="fas fa-trash"></i> Remove';
+      pictureUpload.appendChild(removeBtn);
+    }
+
+    // Auto-submit the form
+    setTimeout(() => {
+      document.getElementById('profile-form').submit();
+      if (uploadBtnSpan && originalText) uploadBtnSpan.textContent = originalText;
+    }, 400);
+  };
+  reader.readAsDataURL(file);
+});
+
+// Form validation
+document.getElementById('profile-form').addEventListener('submit', function(event) {
+  const newPassword = document.getElementById('new-password').value;
+  const confirmPassword = document.getElementById('confirm-password').value;
+  
+  if (newPassword && newPassword !== confirmPassword) {
+    event.preventDefault();
+    alert('New passwords do not match!');
+    return false;
+  }
+  
+  if (newPassword && !document.getElementById('current-password').value) {
+    event.preventDefault();
+    alert('Please enter your current password to change your password.');
+    return false;
+  }
+});
+</script>
+{% endblock %}

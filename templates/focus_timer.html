@@ -1,0 +1,578 @@
+{% extends "base.html" %}
+
+{% block title %}Focus Timer - Task Manager{% endblock %}
+
+{% block content %}
+<!-- Dashboard Header -->
+<div class="dashboard-header">
+  <div class="header-content">
+    <div class="page-title-section">
+      <h1 class="gradient-text">
+        <i class="fas fa-bullseye"></i> 
+        Focus Timer
+      </h1>
+      <p class="page-subtitle">Stay focused with the Pomodoro technique</p>
+    </div>
+  </div>
+</div>
+
+<!-- Timer Section -->
+<div class="content-wrapper">
+  <div class="timer-main-container">
+    <!-- Timer Display Card -->
+    <div class="timer-card">
+      <div class="timer-display">
+        <div class="timer-circle">
+          <svg class="timer-progress" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="54" stroke="var(--border-glass)" stroke-width="8" fill="none"/>
+            <circle id="progressCircle" cx="60" cy="60" r="54" stroke="url(#gradient)" stroke-width="8" fill="none" 
+                    stroke-dasharray="339.292" stroke-dashoffset="339.292" stroke-linecap="round"/>
+            <defs>
+              <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:var(--primary-color)"/>
+                <stop offset="100%" style="stop-color:var(--secondary-color)"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <div class="timer-time">
+            <span class="timer-display-time" id="timeDisplay">25:00</span>
+            <span class="timer-label" id="timerLabel">Focus Time</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="timer-controls">
+        <button class="btn-compact btn-primary" id="startBtn">
+          <i class="fas fa-play"></i>
+          <span>Start Focus</span>
+        </button>
+        <button class="btn-compact btn-warning" id="pauseBtn" style="display: none;">
+          <i class="fas fa-pause"></i>
+          <span>Pause</span>
+        </button>
+        <button class="btn-compact btn-outline" id="stopBtn" style="display: none;">
+          <i class="fas fa-stop"></i>
+          <span>Stop</span>
+        </button>
+        <button class="btn-compact btn-outline" id="resetBtn">
+          <i class="fas fa-redo"></i>
+          <span>Reset</span>
+        </button>
+      </div>
+      
+      <!-- Integrated Settings -->
+      <div class="timer-settings-inline">
+        <div class="settings-row">
+          <div class="setting-group">
+            <label for="focusTime">Focus</label>
+            <div class="input-with-suffix focus-variant">
+              <input type="number" id="focusTime" value="25" min="1" max="60" class="timer-input">
+              <span class="input-suffix">min</span>
+              <!-- Custom stepper -->
+              <div class="number-stepper" data-target="focusTime" aria-label="Adjust focus minutes">
+                <button type="button" class="step up" aria-label="Increase focus"><i class="fas fa-chevron-up"></i></button>
+                <button type="button" class="step down" aria-label="Decrease focus"><i class="fas fa-chevron-down"></i></button>
+              </div>
+            </div>
+          </div>
+          <div class="setting-group">
+            <label for="breakTime">Break</label>
+            <div class="input-with-suffix break-variant">
+              <input type="number" id="breakTime" value="5" min="1" max="30" class="timer-input">
+              <span class="input-suffix">min</span>
+              <!-- Custom stepper -->
+              <div class="number-stepper" data-target="breakTime" aria-label="Adjust break minutes">
+                <button type="button" class="step up" aria-label="Increase break"><i class="fas fa-chevron-up"></i></button>
+                <button type="button" class="step down" aria-label="Decrease break"><i class="fas fa-chevron-down"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Stats Section -->
+  <div class="timer-stats-card">
+    <div class="card-header">
+      <h3><i class="fas fa-chart-line"></i> Today's Focus Sessions</h3>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-item">
+        <div class="stat-number" id="completedSessions">0</div>
+        <div class="stat-label">Completed Sessions</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number" id="totalFocusTime">0</div>
+        <div class="stat-label">Total Focus Time (min)</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number" id="streak">0</div>
+        <div class="stat-label">Current Streak</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+class FocusTimer {
+  constructor() {
+    this.timeLeft = 25 * 60; // 25 minutes in seconds
+    this.isRunning = false;
+    this.isPaused = false;
+    this.isFocusMode = true;
+    this.intervalId = null;
+    this.focusDuration = 25 * 60;
+    this.breakDuration = 5 * 60;
+    
+    this.startBtn = document.getElementById('startBtn');
+    this.pauseBtn = document.getElementById('pauseBtn');
+    this.stopBtn = document.getElementById('stopBtn');
+    this.resetBtn = document.getElementById('resetBtn');
+    this.timeDisplay = document.getElementById('timeDisplay');
+    this.timerLabel = document.getElementById('timerLabel');
+    this.progressCircle = document.getElementById('progressCircle');
+    this.focusTimeInput = document.getElementById('focusTime');
+    this.breakTimeInput = document.getElementById('breakTime');
+    
+    this.setupEventListeners();
+    this.attachStepper('focusTime');
+    this.attachStepper('breakTime');
+    this.updateDisplay();
+    this.loadStats();
+  }
+  
+  setupEventListeners() {
+    this.startBtn.addEventListener('click', () => this.start());
+    this.pauseBtn.addEventListener('click', () => this.pause());
+    this.stopBtn.addEventListener('click', () => this.stop());
+    this.resetBtn.addEventListener('click', () => this.reset());
+    
+    this.focusTimeInput.addEventListener('change', () => {
+      this.focusDuration = parseInt(this.focusTimeInput.value) * 60;
+      if (!this.isRunning) {
+        this.timeLeft = this.focusDuration;
+        this.updateDisplay();
+      }
+    });
+    
+    this.breakTimeInput.addEventListener('change', () => {
+      this.breakDuration = parseInt(this.breakTimeInput.value) * 60;
+    });
+  }
+  
+  // Attach custom stepper buttons to an input
+  attachStepper(id) {
+    const input = document.getElementById(id);
+    const stepper = document.querySelector(`.number-stepper[data-target='${id}']`);
+    if (!input || !stepper) return;
+    const min = parseInt(input.getAttribute('min')) || 0;
+    const max = parseInt(input.getAttribute('max')) || 999;
+
+    stepper.querySelector('.step.up').addEventListener('click', () => {
+      const val = Math.min(max, (parseInt(input.value) || 0) + 1);
+      input.value = val;
+      input.dispatchEvent(new Event('change'));
+    });
+    stepper.querySelector('.step.down').addEventListener('click', () => {
+      const val = Math.max(min, (parseInt(input.value) || 0) - 1);
+      input.value = val;
+      input.dispatchEvent(new Event('change'));
+    });
+  }
+  
+  start() {
+    if (!this.isRunning || this.isPaused) {
+      this.isRunning = true;
+      this.isPaused = false;
+      this.intervalId = setInterval(() => this.tick(), 1000);
+      this.updateButtons();
+    }
+  }
+  
+  pause() {
+    if (this.isRunning && !this.isPaused) {
+      this.isPaused = true;
+      clearInterval(this.intervalId);
+      this.updateButtons();
+    }
+  }
+  
+  stop() {
+    this.isRunning = false;
+    this.isPaused = false;
+    clearInterval(this.intervalId);
+    this.reset();
+  }
+  
+  reset() {
+    this.isRunning = false;
+    this.isPaused = false;
+    clearInterval(this.intervalId);
+    this.timeLeft = this.isFocusMode ? this.focusDuration : this.breakDuration;
+    this.updateDisplay();
+    this.updateButtons();
+  }
+  
+  tick() {
+    if (this.timeLeft > 0) {
+      this.timeLeft--;
+      this.updateDisplay();
+    } else {
+      this.completeSession();
+    }
+  }
+  
+  completeSession() {
+    this.isRunning = false;
+    clearInterval(this.intervalId);
+    
+    if (this.isFocusMode) {
+      this.updateStats();
+      this.showNotification('Focus session completed! Time for a break.');
+    } else {
+      this.showNotification('Break time is over! Ready for another focus session?');
+    }
+    
+    this.isFocusMode = !this.isFocusMode;
+    this.timeLeft = this.isFocusMode ? this.focusDuration : this.breakDuration;
+    this.updateDisplay();
+    this.updateButtons();
+  }
+  
+  updateDisplay() {
+    const minutes = Math.floor(this.timeLeft / 60);
+    const seconds = this.timeLeft % 60;
+    this.timeDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    
+    this.timerLabel.textContent = this.isFocusMode ? 'Focus Time' : 'Break Time';
+    
+    // Update progress circle
+    const totalTime = this.isFocusMode ? this.focusDuration : this.breakDuration;
+    const progress = (totalTime - this.timeLeft) / totalTime;
+    const circumference = 2 * Math.PI * 54;
+    const dashOffset = circumference - (progress * circumference);
+    this.progressCircle.style.strokeDashoffset = dashOffset;
+  }
+  
+  updateButtons() {
+    if (this.isRunning && !this.isPaused) {
+      this.startBtn.style.display = 'none';
+      this.pauseBtn.style.display = 'inline-flex';
+      this.stopBtn.style.display = 'inline-flex';
+    } else if (this.isPaused) {
+      this.startBtn.style.display = 'inline-flex';
+      this.pauseBtn.style.display = 'none';
+      this.stopBtn.style.display = 'inline-flex';
+    } else {
+      this.startBtn.style.display = 'inline-flex';
+      this.pauseBtn.style.display = 'none';
+      this.stopBtn.style.display = 'none';
+    }
+  }
+  
+  updateStats() {
+    const stats = JSON.parse(localStorage.getItem('focusStats') || '{"sessions": 0, "totalTime": 0, "streak": 0}');
+    stats.sessions++;
+    stats.totalTime += Math.floor(this.focusDuration / 60);
+    stats.streak++;
+    localStorage.setItem('focusStats', JSON.stringify(stats));
+    this.loadStats();
+  }
+  
+  loadStats() {
+    const stats = JSON.parse(localStorage.getItem('focusStats') || '{"sessions": 0, "totalTime": 0, "streak": 0}');
+    document.getElementById('completedSessions').textContent = stats.sessions;
+    document.getElementById('totalFocusTime').textContent = stats.totalTime;
+    document.getElementById('streak').textContent = stats.streak;
+  }
+  
+  showNotification(message) {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification('Focus Timer', { body: message });
+    } else if ('Notification' in window && Notification.permission !== 'denied') {
+      Notification.requestPermission().then(permission => {
+        if (permission === 'granted') {
+          new Notification('Focus Timer', { body: message });
+        }
+      });
+    }
+  }
+}
+
+// Initialize timer when page loads
+document.addEventListener('DOMContentLoaded', () => {
+  new FocusTimer();
+});
+</script>
+
+<style>
+.timer-container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.timer-card {
+  background: var(--card-bg);
+  border-radius: 1rem;
+  padding: 2rem;
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-color);
+  margin-bottom: 2rem;
+}
+
+.timer-display {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.timer-circle {
+  position: relative;
+  display: inline-block;
+}
+
+.timer-progress {
+  width: 240px;
+  height: 240px;
+  transform: rotate(-90deg);
+}
+
+.timer-time {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.timer-time span {
+  display: block;
+  color: var(--text-primary);
+}
+
+#timeDisplay {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.timer-label {
+  font-size: 1rem;
+  opacity: 0.7;
+}
+
+.timer-controls {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.timer-settings {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem; /* Increased gap for better spacing */
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.setting-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem; /* Added gap for better spacing */
+}
+
+.setting-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  font-size: 1.1rem; /* Larger label text */
+  color: var(--text-primary);
+}
+
+.timer-input {
+  width: 100%;
+  padding: 1.25rem 1rem; /* Increased padding for larger touch target */
+  border: 2px solid var(--border-color);
+  border-radius: 12px; /* Larger border radius */
+  background: var(--input-bg);
+  color: var(--text-primary);
+  font-size: 1.5rem; /* Much larger font size */
+  font-weight: 600; /* Bold text for better visibility */
+  text-align: center; /* Center the numbers */
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+.timer-input:focus {
+  outline: none;
+  border-color: rgba(102, 126, 234, 0.8); /* Stronger focus border */
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2), 0 4px 12px rgba(102, 126, 234, 0.15); /* Enhanced focus shadow */
+  transform: translateY(-2px); /* Slight lift effect */
+}
+
+.timer-input:hover {
+  border-color: rgba(102, 126, 234, 0.6);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+/* Just make the default spinners more visible without changing the design */
+.timer-input::-webkit-outer-spin-button,
+.timer-input::-webkit-inner-spin-button {
+  opacity: 1; /* Make them visible */
+  height: 22px;
+  cursor: pointer;
+}
+
+.timer-stats {
+  background: var(--card-bg);
+  border-radius: 1rem;
+  padding: 2rem;
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-color);
+}
+
+.timer-stats h3 {
+  margin-bottom: 1.5rem;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.stat-card {
+  text-align: center;
+  padding: 1rem;
+  background: rgba(102, 126, 234, 0.05);
+  border-radius: 0.75rem;
+  border: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 768px) {
+  .timer-settings {
+    grid-template-columns: 1fr;
+    gap: 1.5rem; /* Maintain good spacing on mobile */
+  }
+  
+  .timer-input {
+    font-size: 1.75rem; /* Even larger on mobile for easier touch */
+    padding: 1.5rem 1rem; /* More padding on mobile */
+  }
+  
+  .setting-group label {
+    font-size: 1.2rem; /* Larger labels on mobile */
+  }
+  
+  .timer-controls {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .timer-progress {
+    width: 200px;
+    height: 200px;
+  }
+  
+  #timeDisplay {
+    font-size: 2.5rem;
+  }
+}
+
+/* Hide native number spinners cross-browser */
+.page-focus_timer input[type=number]::-webkit-outer-spin-button,
+.page-focus_timer input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.page-focus_timer input[type=number] { -moz-appearance: textfield; appearance: textfield; }
+
+/* Integrated pill control: number, unit, and stepper inside one box */
+.page-focus_timer .timer-settings-inline .input-with-suffix {
+  display: grid;
+  grid-template-columns: 1fr auto 36px;
+  align-items: stretch;
+  height: 44px;
+  padding: 0;
+  border-radius: 12px;
+  border: 1px solid var(--border-glass);
+  background: var(--bg-glass);
+  backdrop-filter: blur(16px);
+  overflow: hidden;
+}
+
+.page-focus_timer .timer-settings-inline .timer-input {
+  grid-column: 1;
+  width: 100%;
+  border: 0 !important;
+  background: transparent !important;
+  color: var(--text-primary);
+  text-align: center;
+  font-weight: 600;
+  padding: 0 12px !important;
+  height: 100%;
+}
+
+.page-focus_timer .timer-settings-inline .input-suffix {
+  grid-column: 2;
+  position: static !important;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  /* removed border-left to eliminate the small white line between number and unit */
+  pointer-events: none;
+}
+
+.page-focus_timer .timer-settings-inline .number-stepper {
+  grid-column: 3;
+  position: static !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  border-left: 1px solid var(--border-glass); /* keep this divider */
+  background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+}
+
+.page-focus_timer .timer-settings-inline .number-stepper .step {
+  -webkit-appearance: none; appearance: none;
+  background: transparent;
+  border: 0;
+  height: 50%;
+  width: 100%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-primary);
+}
+.page-focus_timer .timer-settings-inline .number-stepper .step:hover { background: rgba(255,255,255,0.05); }
+.page-focus_timer .timer-settings-inline .number-stepper .step i { opacity: 0.95; }
+
+/* Slightly tighter spacing so number + unit feel balanced */
+.page-focus_timer .timer-settings-inline .focus-variant .timer-input,
+.page-focus_timer .timer-settings-inline .break-variant .timer-input { padding-right: 8px !important; }
+
+/* Ensure any earlier absolute positioning is overridden */
+.page-focus_timer .input-with-suffix .number-stepper { right: auto; top: auto; bottom: auto; }
+</style>
+{% endblock %}

@@ -1,0 +1,295 @@
+/*-----------------------------------
+  Authentication Pages Styles
+  
+  Only loaded on login/register pages
+  All styles scoped to .page-login and .page-register
+-----------------------------------*/
+
+/* Auth Container - scoped to auth pages */
+.page-login .auth-container,
+.page-register .auth-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Background Elements - scoped to auth pages */
+.page-login .auth-bg,
+.page-register .auth-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--bg-primary);
+  z-index: 0;
+}
+
+.page-login .floating-elements,
+.page-register .floating-elements {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.page-login .floating-element,
+.page-register .floating-element {
+  position: absolute;
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-glass);
+  border-radius: 50%;
+  animation: float 20s infinite linear;
+}
+
+.page-login .floating-element:nth-child(1),
+.page-register .floating-element:nth-child(1) {
+  width: 300px;
+  height: 300px;
+  top: -150px;
+  left: -150px;
+  animation-delay: 0s;
+}
+
+.page-login .floating-element:nth-child(2),
+.page-register .floating-element:nth-child(2) {
+  width: 200px;
+  height: 200px;
+  top: 20%;
+  right: -100px;
+  animation-delay: -7s;
+}
+
+.page-login .floating-element:nth-child(3),
+.page-register .floating-element:nth-child(3) {
+  width: 150px;
+  height: 150px;
+  bottom: 10%;
+  left: 10%;
+  animation-delay: -14s;
+}
+
+/* Auth Forms - scoped to auth pages */
+.page-login .auth-form,
+.page-register .auth-form {
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-glass);
+  border-radius: 20px;
+  padding: 3rem 2.5rem;
+  width: 100%;
+  max-width: 450px;
+  position: relative;
+  z-index: 10;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+}
+
+.page-login .auth-header,
+.page-register .auth-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.page-login .auth-title,
+.page-register .auth-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.page-login .auth-subtitle,
+.page-register .auth-subtitle {
+  color: var(--text-muted);
+  font-size: 1rem;
+}
+
+/* Form Elements - scoped to auth pages */
+.page-login .form-group,
+.page-register .form-group {
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.page-login .form-label,
+.page-register .form-label {
+  display: block;
+  color: var(--text-secondary);
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.page-login .form-input,
+.page-register .form-input {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-glass);
+  border-radius: 12px;
+  color: var(--text-primary);
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.page-login .form-input:focus,
+.page-register .form-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  background: var(--bg-glass);
+}
+
+.page-login .form-input::placeholder,
+.page-register .form-input::placeholder {
+  color: var(--text-muted);
+}
+
+/* Buttons - scoped to auth pages */
+.page-login .btn-auth,
+.page-register .btn-auth {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 1.5rem;
+}
+
+.page-login .btn-auth:hover,
+.page-register .btn-auth:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+}
+
+.page-login .btn-auth:active,
+.page-register .btn-auth:active {
+  transform: translateY(0);
+}
+
+/* Links - scoped to auth pages */
+.page-login .auth-link,
+.page-register .auth-link {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.page-login .auth-link a,
+.page-register .auth-link a {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.page-login .auth-link a:hover,
+.page-register .auth-link a:hover {
+  color: var(--secondary-color);
+  text-decoration: underline;
+}
+
+/* Dark Mode Toggle - scoped to auth pages */
+.page-login .dark-mode-toggle,
+.page-register .dark-mode-toggle {
+  position: fixed;
+  top: 2rem;
+  right: 2rem;
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-glass);
+  color: var(--text-primary);
+  padding: 0.75rem;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.page-login .dark-mode-toggle:hover,
+.page-register .dark-mode-toggle:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-glass-hover);
+}
+
+/* Animations - scoped to auth pages */
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(180deg); }
+}
+
+.page-login .auth-form,
+.page-register .auth-form {
+  animation: slideUp 0.8s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Error/Success Messages - scoped to auth pages */
+.page-login .flash,
+.page-register .flash {
+  padding: 1rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+}
+
+.page-login .flash-error,
+.page-register .flash-error {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.page-login .flash-success,
+.page-register .flash-success {
+  background: rgba(34, 197, 94, 0.1);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+/* Responsive Design - scoped to auth pages */
+@media (max-width: 768px) {
+  .page-login .auth-form,
+  .page-register .auth-form {
+    margin: 1rem;
+    padding: 2rem 1.5rem;
+  }
+  
+  .page-login .auth-title,
+  .page-register .auth-title {
+    font-size: 1.75rem;
+  }
+  
+  .page-login .dark-mode-toggle,
+  .page-register .dark-mode-toggle {
+    top: 1rem;
+    right: 1rem;
+  }
+}
