@@ -15,7 +15,14 @@ import uuid
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-key-change-me')
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///app.db')
+
+# Fix DATABASE_URL for psycopg compatibility
+database_url = os.environ.get('DATABASE_URL', 'sqlite:///app.db')
+if database_url.startswith('postgresql://'):
+    # Convert postgresql:// to postgresql+psycopg:// for modern psycopg driver
+    database_url = database_url.replace('postgresql://', 'postgresql+psycopg://')
+
+app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Upload configuration
